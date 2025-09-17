@@ -1,0 +1,25 @@
+Employees (EID, Name, Age) = {
+  E1, John, 32
+  E2, Alice, 28
+  E3, Bob, 29
+}
+
+Departments (Dept, Manager) = {
+  Sales, Carol
+  HR, Dana
+}
+
+EmpDept (EID, Dept) = {
+  E1, Sales
+  E2, HR
+  E3, Sales
+}
+
+Query: select Age > 30 (Employees)
+Query: π Name (σ Age > 28 (Employees))
+Query: join [left.EID = right.EID] (Employees, EmpDept)
+Query: join(Employees, EmpDept, left.EID = right.EID)
+Query: Employees ∪ Employees
+Query: (σ Age > 28 (Employees)) ∩ (σ Age > 28 (Employees))
+Query: (σ Age > 28 (Employees)) - (σ Age > 30 (Employees))
+Query: (join (Employees, EmpDept)) ⋈ Departments
