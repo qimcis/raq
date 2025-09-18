@@ -12,7 +12,6 @@ def read_input_text(path: str | None) -> str:
 
 
 def main(argv: list[str]) -> int:
-    # Simple arg parsing to support a REPL mode
     if len(argv) >= 2 and argv[1] in ("--repl", "-i"):
         if len(argv) < 3:
             print("Usage: python3 main.py --repl <defs-file>")
@@ -46,7 +45,7 @@ def main(argv: list[str]) -> int:
 
 
 def repl(defs_path: str) -> int:
-    """Interactive loop: load relations once, then accept queries line-by-line.
+    """Load relations once, then accept queries line-by-line.
 
     Commands:
       :help            Show help
@@ -56,7 +55,7 @@ def repl(defs_path: str) -> int:
       :quit / :exit    Exit the REPL
 
     Query input:
-      - Enter a relational algebra expression directly (σ/π/⋈/set ops or functional forms), or
+      - Enter an expression directly (σ/π/⋈/set ops or functional forms), or
       - Use the legacy prefix: `Query: <expr>`
     """
     try:
@@ -123,9 +122,6 @@ def repl(defs_path: str) -> int:
             print_relation(result)
         except Exception as e:
             print(f"Error: {e}")
-    # Unreachable
-    # return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))

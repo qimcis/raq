@@ -2,7 +2,6 @@ Relational Algebra Query (RAQ) Processor
 =======================================
 
 A tiny Python CLI that reads relation definitions and relational algebra (RA) queries, executes them, and prints the results.
-Everything is implemented with core Python — no data-processing libraries like pandas.
 
 Quick Start
 - Run the test file: `python3 main.py examples/test.txt`
