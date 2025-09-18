@@ -171,19 +171,36 @@ class Parser:
 
     def _collect_until_child_lparen(self) -> List[TOKEN]:
         collected: List[TOKEN] = []
-        depth = 0
+        depth = 0  # parentheses depth inside predicate text
         while True:
             tok = self.peek()
             if tok is None:
                 break
-            if tok[0] == "LPAREN" and depth == 0:
-                break
-            if tok[0] == "LPAREN":
+            ttype, _ = tok
+            # If we see an LPAREN:
+            if ttype == "LPAREN":
+                prev = collected[-1] if collected else None
+                # If we are not currently inside predicate parentheses and
+                # the previous token ends a predicate (IDENT/NUMBER/STRING/RPAREN),
+                # then this LPAREN is the start of the child expression.
+                if depth == 0 and prev is not None and (
+                    prev[0] in ("IDENT", "NUMBER", "STRING", "RPAREN") or
+                    (prev[0] == "KW" and prev[1] in ("true", "false", "null"))
+                ):
+                    break
+                # Otherwise, treat it as predicate grouping
                 depth += 1
-            elif tok[0] == "RPAREN":
+                collected.append(self.pop())
+                continue
+            # Closing parenthesis: close predicate grouping if any
+            if ttype == "RPAREN":
                 if depth == 0:
+                    # Unbalanced close - let the predicate parser surface an error later
                     break
                 depth -= 1
+                collected.append(self.pop())
+                continue
+            # Otherwise, token is part of predicate
             collected.append(self.pop())
         return collected
 
@@ -235,4 +252,3 @@ def parse_query(expr: str) -> RAType:
     if parser.peek() is not None:
         raise ValueError(f"Unexpected input after end of expression: {parser.peek()}")
     return ast
-

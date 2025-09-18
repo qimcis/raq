@@ -19,7 +19,8 @@ def evaluate(node: RAType, rels: Dict[str, Relation]) -> Relation:
         out_rows: List[Dict[str, Any]] = []
         for r in child.rows:
             ctx = {k: v for k, v in r.items()}
-            if eval_predicate(node.predicate, ctx):
+            res_bool = eval_predicate(node.predicate, ctx)
+            if res_bool:
                 out_rows.append(dict(r))
         res = Relation(name=f"Select({child.name})", header=list(child.header), rows=out_rows)
         res.dedup()
@@ -125,4 +126,3 @@ def evaluate(node: RAType, rels: Dict[str, Relation]) -> Relation:
         raise ValueError(f"Unknown set operation: {node.op}")
 
     raise ValueError(f"Unsupported RA node: {node}")
-

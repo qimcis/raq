@@ -75,6 +75,7 @@ Predicates & Qualifiers
 ```
 Comparisons: =, ==, !=, <, <=, >, >=
 Boolean: and/or/not  (also ∧/∨/¬, &&/||)
+Unary: numeric unary minus in predicates, e.g., Age = -1 or -Age < 0
 Qualify in joins: left.Age, right.Age, or Rel.Attr
 ```
 

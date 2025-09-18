@@ -22,7 +22,7 @@ class PAttr(PredNode):
 
 @dataclass
 class PUnary(PredNode):
-    op: str  # 'not'
+    op: str  # 'not' | 'neg'
     expr: PredNode
 
 
@@ -88,10 +88,16 @@ class PredParser:
 
     def parse_unary(self) -> PredNode:
         tok = self.peek()
+        # Boolean NOT
         if tok and tok[0] == 'KW' and tok[1] == 'not':
             self.pop()
             expr = self.parse_unary()
             return PUnary(op='not', expr=expr)
+        # Unary minus (supports '-' and Unicode '−')
+        if tok and tok[0] == 'DIFF_SYM' and tok[1] in ('-', '−'):
+            self.pop()
+            expr = self.parse_unary()
+            return PUnary(op='neg', expr=expr)
         return self.parse_primary()
 
     def parse_primary(self) -> PredNode:
@@ -144,6 +150,13 @@ def eval_predicate(pred: PredNode, ctx: dict[str, Any]) -> bool:
     if isinstance(pred, PUnary):
         if pred.op == 'not':
             return not eval_predicate(pred.expr, ctx)
+        if pred.op == 'neg':
+            # Treat numeric value truthiness when used directly as a predicate
+            v = eval_value(pred.expr, ctx)
+            try:
+                return bool(-v)
+            except Exception as e:
+                raise ValueError("Unary minus requires a numeric value") from e
         raise ValueError(f"Unknown unary operator: {pred.op}")
     if isinstance(pred, PBinary):
         if pred.op in ('and', 'or'):
@@ -154,6 +167,7 @@ def eval_predicate(pred: PredNode, ctx: dict[str, Any]) -> bool:
                 return l or eval_predicate(pred.right, ctx)
         lv = eval_value(pred.left, ctx)
         rv = eval_value(pred.right, ctx)
+        #
         if pred.op in ('==', '='):
             return lv == rv
         if pred.op == '!=':
@@ -175,5 +189,11 @@ def eval_value(node: PredNode, ctx: dict[str, Any]) -> Any:
         return node.value
     if isinstance(node, PAttr):
         return _lookup_attr(ctx, node.name)
+    if isinstance(node, PUnary):
+        if node.op == 'neg':
+            v = eval_value(node.expr, ctx)
+            try:
+                return -v
+            except Exception as e:
+                raise ValueError("Unary minus requires a numeric value") from e
     return eval_predicate(node, ctx)
-
