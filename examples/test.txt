@@ -1,0 +1,82 @@
+# Employees and departments
+Employees (EID, Name, Age) = {
+  E1, John, 32
+  E2, Alice, 28
+  E3, Bob, 29
+}
+
+Departments (Dept, Manager) = {
+  Sales, Carol
+  HR, Dana
+}
+
+EmpDept (EID, Dept) = {
+  E1, Sales
+  E2, HR
+  E3, Sales
+}
+
+Query: σ Age > 30 (Employees)
+Query: π Name (σ (Age > 28 and (Name != "Alice")) (Employees))
+Query: Employees ⋈ EmpDept
+Query: Employees ⋈[left.EID = right.EID] EmpDept
+Query: join(Employees, EmpDept, left.EID = right.EID)
+Query: (join (Employees, EmpDept)) ⋈ Departments
+
+# Set operations with schema reordering
+R1 (A, B) = {
+  1, 2
+  3, 4
+}
+R2 (B, A) = {
+  2, 1
+  4, 3
+  5, 6
+}
+
+Query: R1 ∪ R2
+Query: R1 ∩ R2
+Query: R1 − R2
+Query: union(R1, R2)
+Query: intersect(R1, R2)
+Query: minus(R1, R2)
+
+# Natural join with no common attributes => cross product
+L (A) = {
+  1
+  2
+}
+R (B) = {
+  x
+}
+
+Query: L ⋈ R
+
+# Unary minus, booleans, nulls
+T (K, Active, Val) = {
+  a, true, 1
+  b, false, 2
+  c, true, null
+}
+
+Query: σ Active = true (T)
+Query: σ Val = null (T)
+
+U (Age) = {
+  1
+  -1
+  0
+}
+
+Query: σ Age = -1 (U)
+Query: σ -Age > 0 (U)
+Query: σ -(Age) < -0.5 (U)
+
+# CSV quoted values
+Cities (ID, Name) = {
+  1, "New York, NY"
+  2, "Los Angeles"
+}
+
+Query: π Name (Cities)
+
